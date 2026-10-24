@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f6f7" />
+    <meta
+      name="description"
+      content="Explore signed-K simultaneous long-short feedback control on trending Ornstein-Uhlenbeck price paths."
+    />
+    <title>SLS / Trending OU Research Simulator</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="site-header">
+        <a class="wordmark" href="./" aria-label="SLS Research Simulator home">
+          <span class="wordmark-mark" aria-hidden="true">S</span>
+          <span>FIELDNOTES <span class="wordmark-divider">/</span> Information and Decision Algorithms Laboratories</span>
+        </a>
+        <div class="header-meta"><span class="live-dot"></span> INTERACTIVE RESEARCH MODEL</div>
+      </header>
+
+      <main>
+        <section class="intro" aria-labelledby="page-title">
+          <div class="eyebrow">STOCHASTIC CONTROL · EXPLORATION TOOL</div>
+          <h1 id="page-title">A closer look at<br /><em>long–short feedback.</em></h1>
+          <p class="intro-copy">
+            Explore how signed feedback shapes cumulative gains when prices follow a trending
+            Ornstein–Uhlenbeck process. Compare each path with the sample average and the paper’s
+            continuous-time expectation.
+          </p>
+          <div class="model-pills">
+            <span>100 paths</span><span>50 Euler steps</span><span>Shared innovations</span>
+          </div>
+        </section>
+
+        <div class="workspace">
+          <aside class="control-panel" aria-label="Simulation controls">
+            <div class="panel-heading">
+              <div><span class="section-index">01</span><h2>Set the model</h2></div>
+              <span class="fixed-badge">T 1 · N 50 · M 100</span>
+            </div>
+            <form id="parameter-form">
+              <div class="field-section">
+                <div class="field-section-title">PROCESS PARAMETERS</div>
+                <div class="field-grid two-columns">
+                  <label class="field">
+                    <span>ν<sub>0</sub> <small>initial drift</small></span>
+                    <input id="nu0" name="nu0" type="number" step="any" value="0.05" required />
+                  </label>
+                  <label class="field">
+                    <span>ν<sub>1</sub> <small>drift trend</small></span>
+                    <input id="nu1" name="nu1" type="number" step="any" value="0.01" required />
+                  </label>
+                  <label class="field">
+                    <span>κ <small>mean reversion</small></span>
+                    <input id="kappa" name="kappa" type="number" step="any" value="1.5" required />
+                  </label>
+                  <label class="field">
+                    <span>σ <small>volatility</small></span>
+                    <input id="sigma" name="sigma" type="number" min="0" step="any" value="0.1" required />
+                  </label>
+                </div>
+                <p class="field-note">Both drift coefficients are used as written in the paper. Coefficients are annualized.</p>
+              </div>
+
+              <div class="field-section">
+                <div class="field-section-title">STRATEGY & REPRODUCIBILITY</div>
+                <div class="field-grid two-columns">
+                  <label class="field">
+                    <span>Selected K <small>signed feedback</small></span>
+                    <input id="selected-k" name="selectedK" type="number" step="any" value="2" required />
+                  </label>
+                  <label class="field">
+                    <span>Path seed</span>
+                    <input id="seed" name="seed" type="number" min="0" max="4294967295" step="1" value="7" required />
+                  </label>
+                </div>
+                <div class="field-grid three-columns sweep-fields">
+                  <label class="field">
+                    <span>K min</span>
+                    <input id="k-min" name="kMin" type="number" step="any" value="-40" required />
+                  </label>
+                  <label class="field">
+                    <span>K max</span>
+                    <input id="k-max" name="kMax" type="number" step="any" value="40" required />
+                  </label>
+                  <label class="field">
+                    <span>Points</span>
+                    <input id="k-count" name="kCount" type="number" min="2" max="1001" step="1" value="161" required />
+                  </label>
+                </div>
+                <p class="field-note">I<sub>0</sub> is fixed at $5,000 per leg. Changing model parameters reuses the same innovations; New paths changes the seed.</p>
+              </div>
+
+              <div class="form-actions">
+                <button class="button button-primary" type="submit" id="run-button">
+                  <span aria-hidden="true">↗</span> Run simulation
+                </button>
+                <button class="button button-secondary" type="button" id="new-paths-button">
+                  <span aria-hidden="true">↻</span> New paths
+                </button>
+              </div>
+            </form>
+
+            <div class="status-card" aria-live="polite">
+              <span class="status-indicator" id="status-indicator"></span>
+              <div><strong id="status-title">Preparing the experiment</strong><p id="status-text">The simulation runs in a background worker.</p></div>
+            </div>
+            <div class="bound-note" id="bound-note" aria-live="polite">
+              <span class="bound-symbol">K*</span>
+              <p>Run the model to check whether Theorem 3 applies.</p>
+            </div>
+          </aside>
+
+          <section class="visualization" aria-label="Simulation charts">
+            <div class="chart-card chart-card-wide">
+              <div class="chart-heading">
+                <div><span class="section-index">02</span><div><h2>Price paths</h2><p>Shared path identities · S(t) = exp(X(t))</p></div></div>
+                <span class="chart-tag">SIMULATED · 100 PATHS</span>
+              </div>
+              <div class="chart-wrap"><div id="price-chart" class="chart" aria-label="One hundred simulated price paths"></div></div>
+              <div class="chart-foot"><span id="highlight-label">Hover a path to link it across charts</span><span>Log-price Euler–Maruyama</span></div>
+            </div>
+
+            <div class="chart-card chart-card-wide">
+              <div class="chart-heading">
+                <div><span class="section-index">03</span><div><h2>Terminal gain by feedback</h2><p>Same 100 paths swept over signed K</p></div></div>
+                <span class="chart-tag">HORIZON · T = 1</span>
+              </div>
+              <div class="chart-legend" aria-label="Chart legend">
+                <span><i class="legend-mark legend-path"></i>Individual paths</span>
+                <span><i class="legend-mark legend-mean"></i>Mean simulated gain</span>
+                <span><i class="legend-mark legend-theory"></i>Analytical expectation</span>
+                <span><i class="legend-mark legend-selected"></i>Selected K</span>
+              </div>
+              <div class="chart-wrap"><div id="sweep-chart" class="chart" aria-label="Terminal gain versus signed feedback K; click to select K"></div></div>
+              <div class="chart-foot"><span>Click the curve to select K for the cumulative gain chart</span><span>Gain in dollars</span></div>
+            </div>
+
+            <div class="chart-card chart-card-wide">
+              <div class="chart-heading">
+                <div><span class="section-index">04</span><div><h2>Cumulative gain</h2><p>Individual paths, empirical mean, and continuous-time theory</p></div></div>
+                <span class="chart-tag" id="selected-k-label">SELECTED K = 2</span>
+              </div>
+              <div class="chart-wrap"><div id="gain-chart" class="chart" aria-label="Cumulative gains over time for each path and expected gain"></div></div>
+              <div class="chart-foot"><span>Linear dollar scale · losses remain visible</span><span>All curves start at $0</span></div>
+            </div>
+          </section>
+        </div>
+
+        <section class="methodology" aria-labelledby="method-title">
+          <div class="method-heading"><span class="section-index">05</span><h2 id="method-title">Method notes</h2></div>
+          <div class="method-grid">
+            <p><strong>Numerical paths.</strong> The log-price process uses 50 forward-Euler intervals over T = 1. The controller uses the same Brownian increment and the Ito return increment Δr = ΔX + σ²Δt/2. This is not the sampled simple return exp(ΔX) − 1.</p>
+            <p><strong>What the lines mean.</strong> The 100 path traces and their sample mean use the Euler simulation. The expectation curve is the paper’s continuous-time analytical result; finite-sample noise and Euler discretization mean they need not coincide.</p>
+            <p><strong>Threshold.</strong> When shown, K* is Theorem 3’s sufficient bound for positive continuous-time expected gain when K &lt; K*. It is not an optimum, a pathwise guarantee, or a guarantee about the Euler sample mean.</p>
+          </div>
+        </section>
+      </main>
+      <footer><span>SIGNED-K SLS · TRENDING OU</span><span>Research simulator · No trading advice</span></footer>
+    </div>
+    <script type="module" src="./src/ui/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "sls-trending-ou-simulator",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test:ts-parity": "node --experimental-strip-types tests/typescript_parity.mjs"
+  },
+  "dependencies": {
+    "plotly.js-basic-dist-min": "4.1.2"
+  },
+  "devDependencies": {
+    "@types/plotly.js": "3.0.15",
+    "typescript": "7.0.2",
+    "vite": "8.3.5"
+  }
+}
