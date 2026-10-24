@@ -1,10 +1,7 @@
 # SLS / OUSLS research simulator
 
 This repository is the source for a reproducible browser simulator for signed-K
-SLS on trending Ornstein–Uhlenbeck log prices. See
-[`SLS_OUSLS_Codex_Handoff.md`](SLS_OUSLS_Codex_Handoff.md) for the mathematical
-specification, numerical method, chart requirements, and unresolved OUSLS naming
-convention.
+SLS on trending Ornstein–Uhlenbeck log prices. Access the site at https://acrid2075.github.io/OUSLS-Interactive-Display/.
 
 ## Project layout
 
